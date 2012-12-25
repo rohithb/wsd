@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html><head>
+  <title> WSD </title>
+    <meta charset="utf-8">
+
+ 
+ 
+    <link rel="stylesheet" href="./css/live.css" />
+    <script src="/static/lib/jquery-1.7.min.js"></script>
+
+    <link rel="stylesheet" href="/static/redactor/redactor.css" />
+    <script src="/static/redactor/redactor.js"></script>
+
+    <style type="text/css">
+	body .redactor_toolbar li a.redactor_btn_button1 {
+		background: url(/static/img/button1.png) no-repeat;
+	}
+	</style>
+	
+	<script type="text/javascript">
+	
+	function testButton(obj, event, key)
+	{
+		obj.execCommand('underline');
+	}
+	
+	$(document).ready(
+		function()
+		{
+
+			
+			$('#123').redactor({
+				focus: true, 
+				buttonsAdd: ['|', 'button1'], 
+				buttonsCustom: {
+					button1: {
+						title: 'Disambiguate', 
+						callback: function(obj)
+						{
+							var text = $('#123').val();
+							var selected_word = $('#123').getSelected();
+							//alert(selected_word);
+							$.ajax({
+								type: "POST",
+								url: "/doWSD/",
+								data: {wsdText: text, wsdWord : selected_word },
+								cache: false,
+								success: function(html){
+									$("#response").html(html);
+								}
+								});
+						}
+                     
+					} 
+				}  
+			});	
+$('.redactor_btn_button1').addClass("testbu");		
+
+		}
+	);
+
+	</script>				
+
+</head>
+<body>
+{% block content %}
+{% endblock %}
+	<div id="page">
+
+		<textarea id="123" name="content">
+			A large company needs a sustainable business model.
+		</textarea>
+
+</br></br>
+<div id="response"></div>
+</body></html>
