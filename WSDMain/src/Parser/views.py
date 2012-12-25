@@ -2,7 +2,8 @@
 from nltk.tokenize import sent_tokenize, word_tokenize
 from django.http import HttpResponse
 from nltk.corpus import wordnet as wn
-from Parser.functions import makeQueryString, googleSearch, extractLinks
+from Parser.functions import makeQueryString, googleSearch, extractLinks,\
+    fetchPages
 
 def makeGraph(request):
     if 'wsdText' in request.POST:
@@ -43,9 +44,8 @@ def doWSD(request):
     queryStr = makeQueryString(wsdText)
     page = googleSearch(queryStr)
     urlList=extractLinks(page)
-    html=""
-    for l in urlList:
-        html+=l+"</br>"
-    return HttpResponse(html)
+    contents=fetchPages(urlList)
+
+    return HttpResponse(contents[0])
     
     
