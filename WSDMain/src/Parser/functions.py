@@ -10,10 +10,19 @@ from urllib2 import urlopen, Request
 from BeautifulSoup import BeautifulSoup
 from django.utils.html import strip_tags
 import re
+from libxml2 import newText
 
-def removePunctuations(text):
-    newText=text.translate(string.maketrans("",""),string.punctuation)
-    newText=re.sub('[0-9]+',"",newText)
+
+def removePunctuations(text,ignore="",removeNumbers=True):
+    
+    if(ignore!=""):
+        punctuationsWithoutFullStop = string.punctuation.replace(ignore, "") # this is to ignore full  stops
+    else:
+        punctuationsWithoutFullStop = string.punctuation
+    #full stops will remain in the string
+    newText=text.translate(string.maketrans("",""),punctuationsWithoutFullStop)
+    if(removeNumbers==True):
+        newText=re.sub('[0-9]+',"",newText)
     return newText
 
 def removeStopWords(splitText):
@@ -31,10 +40,10 @@ def makeQueryString(text):
     return queryStr
 def googleSearch(query):
     url = 'http://www.bing.com/search?q='+query
- #   values = {
- #             'q' : query 
- #             }
- #   data = urlencode(values)
+#   values = {
+#             'q' : query 
+#             }
+#   data = urlencode(values)
 #    req = Request(url,data)
     response = urlopen(url)
     the_page=response.read()
@@ -46,7 +55,7 @@ def extractLinks(page):
             urlList.append(a.findNext('a').get('href').encode('ascii','ignore')) 
     return urlList
 
-def fetchPages(urlList):
+def fetchSentsFromPages(urlList,wsdWord):
     contents=[]
     for count in range(0,1):
         link=urlList[count]
@@ -57,7 +66,10 @@ def fetchPages(urlList):
             body=strip_tags(soup.html.body)
         except:
             body=strip_tags(res.read())
-        # sentenece tokenize  
-        body=removePunctuations(body.encode('ascii','ignore'))  # this may cause exclusion of the target word
+        body=body[:2000]
+        # sentenece tokenize  also use concordance.
+        # body_tokens= word_tokenize(body)
+        # text =Text(body_tokens)      
+        body=removePunctuations(body.encode('ascii','ignore'),ignore=".")  
         contents.append(body)
     return contents
