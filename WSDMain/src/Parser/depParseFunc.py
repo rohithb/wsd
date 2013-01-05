@@ -12,6 +12,7 @@ from urllib import urlencode
 from nltk.tokenize import sent_tokenize
 
 def parseContents(contentList):
+    
     depGraphList=[]
     for content in contentList:
         for s in sent_tokenize(content):

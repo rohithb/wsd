@@ -20,7 +20,7 @@ def makeGraph(request):
     html=""
     for t in sentence_tokens:
         try:
-            syn= wn.synsets(t)
+            syn = wn.synsets(t)
             definition= syn[1].definition
         except:
             definition="Not listed in wordnet"
