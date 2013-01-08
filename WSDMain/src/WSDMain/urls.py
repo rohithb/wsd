@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, url
 from Editor.views import editor
-from Parser.views import makeGraph, doWSD
+from Parser.views import makeGraph, doWSD, doStanParse
 
 # Uncomment the next two lines to enable the admin:
 # from django.contrib import admin
@@ -10,6 +10,7 @@ urlpatterns = patterns('',
                       (r'^$',editor),
                       (r'^makeGraph/$',makeGraph),
                       (r'^doWSD/$',doWSD),
+                      (r'^doStan/$',doStanParse),
     # Examples:
     # url(r'^$', 'WSDMain.views.home', name='home'),
     # url(r'^WSDMain/', include('WSDMain.foo.urls')),

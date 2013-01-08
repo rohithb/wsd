@@ -4,6 +4,7 @@ from django.http import HttpResponse
 from nltk.corpus import wordnet as wn
 from Parser.functions import makeQueryString, googleSearch, extractLinks,fetchSentsFromPages
 from Parser.depParseFunc import parseContents
+from Parser.stanfordParse import StanParse
 
 def makeGraph(request):
     if 'wsdText' in request.POST:
@@ -49,3 +50,8 @@ def doWSD(request):
     return HttpResponse(depGraphList[0])
     
     
+def doStanParse(request):
+    wsdText = "A large company needs a sustainable business model."
+    
+    stan1 = StanParse()
+    stan1.makeInFile(wsdText)
