@@ -47,7 +47,7 @@ def doWSD(request):
     urlList=extractLinks(page)
     contents=fetchSentsFromPages(urlList,wsdWord)
     depGraphList=parseContents(contents)
-    return HttpResponse(depGraphList[0])
+    return HttpResponse(depGraphList)
     
     
 def doStanParse(request):
