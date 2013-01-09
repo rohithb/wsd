@@ -42,7 +42,7 @@
 							//alert(selected_word);
 							$.ajax({
 								type: "POST",
-								url: "/doWSD/",
+								url: "/makeGraph/",
 								data: {wsdText: text, wsdWord : selected_word },
 								cache: false,
 								success: function(html){
