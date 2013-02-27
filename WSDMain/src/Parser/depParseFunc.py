@@ -13,14 +13,14 @@ from nltk.tokenize import sent_tokenize
 from Parser.StanfordParser import StanfordParser
 
 def parseContents(contentList):
-    
+    typedDep=""
     depGraphList=[]
     for content in contentList:
-        for s in sent_tokenize(content):
-            s=re.sub('[\n\t]',"",s)
-            parser = StanfordParser("/home/rohith/stanford-parser/")
-            typedDep = parser.parse(s)
-            typedDep =re.sub('[0-9-]+',"",typedDep) # to remove numbers and '-'
-            rx = re.compile("\((.+), (.+)\)")
-            depGraphList.append(rx.findall(typedDep))
+        parser = StanfordParser ("/home/rohith/stanford-parser")
+        typedDep += parser.parse(content)
+        typedDep =re.sub('[0-9-]+',"",typedDep) # to remove numbers and '-'
+        rx = re.compile("\((.+), (.+)\)")
+        depGraphList.append(rx.findall(typedDep))
+        # import string
+        #string.split(inputString, '\n')  # --> ['Line 1', 'Line 2', 'Line 3']    
     return depGraphList
