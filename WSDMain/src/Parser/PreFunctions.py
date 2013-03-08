@@ -73,4 +73,3 @@ def fetchSentsFromPages(urlList,wsdWord):
         body=removePunctuations(body.encode('ascii','ignore'),ignore=".")  
         contents.append(body)
     return contents
-  

@@ -1,4 +1,4 @@
-# Natural Language Toolkit: Interface to MaltParser
+# Natural Language Toolkit: Interface to StanfordParser
 #
 # Author: Rohith Bhaskaran <vrarohith@gmail.com>
 #
