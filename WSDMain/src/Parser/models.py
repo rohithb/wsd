@@ -25,4 +25,8 @@ class Dependency:
     def getRel(self):
         return self.__rel
         
+    def setAll(self, parent, child, rel):
+        self.__parent = parent
+        self.__child = child
+        self.__rel = rel
 

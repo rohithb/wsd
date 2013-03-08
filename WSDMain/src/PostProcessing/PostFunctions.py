@@ -7,7 +7,7 @@ from nltk.corpus import wordnet
 from PostProcessing.Neo4jDAO import Neo4jDAO
 from Parser.models import Dependency
 
-class postFn:
+class PostFn:
     '''
     contains all the post processing functions
     '''
@@ -23,15 +23,25 @@ class postFn:
                              eg : [[(word1,word2),(word3,word4)...],[(wordi),(wordi+1) ...],...]
         '''
         
-    def chiSq(self, word1, word2):
+        for dlist in depGraphList:
+            for dtuple in dlist:
+                parent = dtuple[0]
+                child = dtuple[1]  
+                rel = self._chiSq(parent, child)
+                self.dep.setAll(parent, child, rel)
+                self.neoo4jDAO.insert(self.dep)
+        
+    def _chiSq(self, word1, word2):
         '''
         calculate the chi-square value of word1 and word2.
         :param word1 : string - first word 
         :param word2 : string - second word
         :return value: chi-square value of word1 and word2
         '''
-        
-        syn1 = wordnet.synsets(word1)[0]
-        syn2 = wordnet.synsets(word2)[0]
-        rel = syn1.wup_similarity(syn2)
+        try:
+            syn1 = wordnet.synsets(word1)[0]
+            syn2 = wordnet.synsets(word2)[0]
+            rel = syn1.wup_similarity(syn2)
+        except:
+            rel = 0.0050 # threshold for chi-square test
         return rel

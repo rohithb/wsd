@@ -3,7 +3,7 @@ Created on 08-Mar-2013
 
 @author: rohith
 '''
-from bulbs.neo4jserver import Graph, Config, NEO4J_URI
+from bulbs.neo4jserver import Graph
 
 class Neo4jDAO(object):
     '''
@@ -15,16 +15,29 @@ class Neo4jDAO(object):
         '''
         Constructor - Initialize neo4j database connection
         '''
-        config = Config('http://localhost:7474/db/data/')
-        self.g = Graph(config)
+#        config = Config('http://localhost:7474/db/data/')
+        self.g = Graph()
     
     def insert(self,dependency):
         '''
         Method for inserting a parent ,child and their relatedness to database
         '''
-        parent = self.g.vertices.create(node=dependency.getParent())
-        child = self.g.vertices.create(node=dependency.getChild())
-        self.g.edges.create(parent,dependency.getRel(),child)
+        #check whether parent node already exists if not create the node
+        parent = self.g.vertices.index.lookup(node=dependency.getParent())
+        if(parent==None):
+            parent = self.g.vertices.create(node=dependency.getParent())
+        else:
+            parent = parent.next()
+            
+        #check whether child node already exists if not create the node
+        child = self.g.vertices.index.lookup(node=dependency.getChild())
+        if(child==None):
+            child = self.g.vertices.create(node=dependency.getChild())
+        else:
+            child = child.next()
+            
+        #create edge between parent and child with label "rel" and property "dep"    
+        self.g.edges.create(parent, "rel", child, dep=dependency.getRel())
         
         
     
