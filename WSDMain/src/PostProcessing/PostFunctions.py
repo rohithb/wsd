@@ -6,6 +6,7 @@ Created on 08-Mar-2013
 from nltk.corpus import wordnet
 from PostProcessing.Neo4jDAO import Neo4jDAO
 from Parser.models import Dependency
+from Parser.depParseFunc import parseSenses
 
 class PostFn:
     '''
@@ -45,3 +46,17 @@ class PostFn:
         except:
             rel = 0.0050 # threshold for chi-square test
         return rel
+    
+    def fetchAndParseGlossess(self,word):
+        '''
+        This function will retrieve all the senses for the parameter "word" . 
+        Also they are parsed and stores the parse tree along with the weight in to a list
+        '''
+        syns= wordnet.synsets(word)
+        senseList=[]
+        for syn in syns:
+            senseList.append(syn.definition)
+        depParsed = parseSenses(senseList)
+        return depParsed
+        
+            
