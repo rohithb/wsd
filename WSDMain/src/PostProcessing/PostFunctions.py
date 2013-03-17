@@ -6,7 +6,8 @@ Created on 08-Mar-2013
 from nltk.corpus import wordnet
 from PostProcessing.Neo4jDAO import Neo4jDAO
 from Parser.models import Dependency
-from Parser.depParseFunc import parseSenses
+from Parser.depParseFunc import parseSenses, parseContents
+from nltk.compat import defaultdict
 
 class PostFn:
     '''
@@ -22,8 +23,7 @@ class PostFn:
         calculate the chi-square value and insert to the database. 
         :param depGraphList : list - representation of dependency graph.
                              eg : [[(word1,word2),(word3,word4)...],[(wordi),(wordi+1) ...],...]
-        '''
-        
+        '''        
         for dlist in depGraphList:
             for dtuple in dlist:
                 parent = dtuple[0]
@@ -47,16 +47,61 @@ class PostFn:
             rel = 0.0050 # threshold for chi-square test
         return rel
     
-    def fetchAndParseGlossess(self,word):
+    def fetchSenses(self, wsdWord):
         '''
-        This function will retrieve all the senses for the parameter "word" . 
-        Also they are parsed and stores the parse tree along with the weight in to a list
+        fetches all senses from wordnet corresponding to wsdWord
+        return 0 if the word is not found in wordNet
         '''
-        syns= wordnet.synsets(word)
+        syns= wordnet.synsets(wsdWord)
         senseList=[]
         for syn in syns:
             senseList.append(syn.definition)
-        depParsed = parseSenses(senseList)
-        return depParsed
+        return senseList
         
-            
+    def createSenseTree(self, senseList):
+        '''
+        Retrieve all the senses for the parameter "word" from wordnet . 
+        Return the dependency graphs of senses (defaultDict)
+        eg: {'conduct': ['institution', 'to', 'business'], 
+        'ROOT': ['created'], 'institution': ['an'], 'created': ['institution', 'conduct']}
+        '''
+        senseDict = []
+        depParsed = parseSenses(senseList)
+        for dep in depParsed:
+            temp = defaultdict( list )
+            for n ,v in dep:
+                temp[n].append(v)
+            senseDict.append(temp)
+        return senseDict
+    
+    def createWSDTextTree(self, wsdText):
+        '''
+        create parse tree for the wsdText.
+        wsdText should be a single sentence.
+        Else only parse tree of first sentence will be returned  
+        '''
+        tempList = []
+        tempList.append(wsdText)
+        tempDict = self.createSenseTree(tempList) # avoiding unnecessary 2d list :-)
+        return tempDict[0]
+    
+    def assignWeightSense(self,senseDict):
+        senseWeight = {}
+        
+          
+        '''
+        def depScore(self, senseList, senseTrees, wsdTextTree):
+        
+        calculate DepScore and return the index number of the sense with largest DepScore
+        Process: Search the KB for each word in each sense
+        
+        #search the KB for each word in each sense
+        score = []
+        for sense in senseList:
+            sense = sense.split()
+            for word in sense:
+                deps = self.neoo4jDAO.findDependent(word) 
+                if(deps != None):
+        '''
+                       
+                    

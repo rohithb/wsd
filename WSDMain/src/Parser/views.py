@@ -36,7 +36,7 @@ def makeGraph(request):
 def doWSD(request):
     postFn= PostFn()
 #   if 'wsdText' in request.POST:
-#        wsdText =request.POST['wsdText']
+#        wsdText =request.POST['wsdText']  # modify in index.html to send only the sentence instead of whole text
 #    else:
 #        text = ''
 #    if 'wsdWord' in request.POST:
@@ -57,6 +57,9 @@ def doWSD(request):
     contents.append(test)
     depGraphList=parseContents(contents)
 #    postFn.insertToDB(depGraphList)
-    senseGraph = postFn.fetchAndParseGlossess(wsdWord)
+    senseList = postFn.fetchSenses(wsdWord)
+    senseTrees = postFn.createSenseTree(senseList)
+    wsdTextTree = postFn.createWSDTextTree(wsdText,text=True)
+    
     return HttpResponse(senseGraph)
     
