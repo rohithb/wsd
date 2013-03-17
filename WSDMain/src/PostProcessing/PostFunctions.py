@@ -16,6 +16,7 @@ class PostFn:
     def __init__(self):
         self.neoo4jDAO = Neo4jDAO()
         self.dep = Dependency()
+        self.wt={}
         
     def insertToDB(self,depGraphList):
         '''
@@ -84,24 +85,36 @@ class PostFn:
         tempList.append(wsdText)
         tempDict = self.createSenseTree(tempList) # avoiding unnecessary 2d list :-)
         return tempDict[0]
+
+    def calulateWeightSense(self,parent, level,l):
+        if(level == 1 and parent == 'ROOT'):
+            return
+        if(level == 0):
+            self.wt={}
+        level+=1
+        a=l[parent]
+        if(len(a) != 0):
+            for i in a:
+                self.wt[i]=1.0/level
+                self.fun(i,level,l)
+        return self.wt
     
-    def assignWeightSense(self,senseDict):
-        senseWeight = {}
-        
-          
+
+    def depScore(self, senseList, senseTrees, wsdTextTree):
         '''
-        def depScore(self, senseList, senseTrees, wsdTextTree):
-        
         calculate DepScore and return the index number of the sense with largest DepScore
         Process: Search the KB for each word in each sense
-        
+        '''
         #search the KB for each word in each sense
         score = []
         for sense in senseList:
             sense = sense.split()
             for word in sense:
                 deps = self.neoo4jDAO.findDependent(word) 
-                if(deps != None):
-        '''
+                if(len(deps) != 0):
+                    
+                    
+                    
+                    
                        
                     
