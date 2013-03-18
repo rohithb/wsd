@@ -16,7 +16,7 @@ def parseContents(contentList):
     typedDep=""
     depGraphList=[]
     str1=[]
-    str1.append('.'.join(contentList)) # to make the whole list into a single item
+    str1.append('. '.join(contentList)) # to make the whole list into a single item
                                         # otherwise the parser need to be initialised many times.
     parser = StanfordParser ("/home/rohith/stanford-parser")
     for content in str1:
@@ -33,7 +33,7 @@ def parseSenses(senseList):
     depGraphList=[]
     tempList=[]
     str1=[]
-    str1.append('.'.join(senseList)) # to make the whole list into a single item
+    str1.append('. '.join(senseList)) # to make the whole list into a single item
                                         # otherwise the parser need to be initialised many times.
     parser = StanfordParser ("/home/rohith/stanford-parser")
     for content in str1:
@@ -41,6 +41,7 @@ def parseSenses(senseList):
         typedDep =re.sub('[0-9-]+',"",typedDep) # to remove numbers and '-'
         #need to separate each senses into induvidual lists
         typedDepList = typedDep.split("\n\n")
+        typedDepList.pop()
         rx = re.compile("\((.+), (.+)\)")
         for dep in typedDepList:
             depGraphList.append(rx.findall(dep))   

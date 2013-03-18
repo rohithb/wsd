@@ -55,7 +55,7 @@ def extractLinks(page):
             urlList.append(a.findNext('a').get('href').encode('ascii','ignore')) 
     return urlList
 
-def fetchSentsFromPages(urlList,wsdWord):
+def fetchSentsFromPages(urlList):
     contents=[]
     for count in range(0,1):
         link=urlList[count]

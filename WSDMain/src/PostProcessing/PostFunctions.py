@@ -21,7 +21,7 @@ class PostFn:
     def insertToDB(self,depGraphList):
         '''
         Extract each pair of words from the dependency list , 
-        calculate the chi-square value and insert to the database. 
+            calculate the chi-square value and insert to the database. 
         :param depGraphList : list - representation of dependency graph.
                              eg : [[(word1,word2),(word3,word4)...],[(wordi),(wordi+1) ...],...]
         '''        
@@ -96,22 +96,37 @@ class PostFn:
         if(len(a) != 0):
             for i in a:
                 self.wt[i]=1.0/level
-                self.fun(i,level,l)
+                self.calulateWeightSense(i,level,l)
         return self.wt
     
 
-    def depScore(self, senseList, senseTrees, wsdTextTree):
+    def depScore(self, senseList, wsdText, senseTrees, wsdTextTree):
         '''
         calculate DepScore and return the index number of the sense with largest DepScore
         Process: Search the KB for each word in each sense
         '''
         #search the KB for each word in each sense
         score = []
-        for sense in senseList:
-            sense = sense.split()
+        l = len(senseList)
+        wsdText = wsdText.split()
+        wtWSDText = self.calulateWeightSense('ROOT', 0, wsdTextTree)
+        for i in range(0,l):
+            tempScore = 0.0
+            wtSense = self.calulateWeightSense('ROOT', 0, senseTrees[i])
+            sense = senseList[i].split()
             for word in sense:
-                deps = self.neoo4jDAO.findDependent(word) 
-                if(len(deps) != 0):
+                deps = self.neoo4jDAO.findDependent(word)
+                if(deps != None):
+                    for tup in deps:
+                        if(str(tup[0]) in wsdText):
+                            node = str(tup[0])
+                            wts=wtSense[word]
+                            wtt =wtWSDText[node]
+                            tempScore += tup[1]* wts* wtt
+                else:
+                    continue
+            score.append(tempScore)
+        return score.index(max(score))
                     
                     
                     

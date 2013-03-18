@@ -50,6 +50,8 @@ class Neo4jDAO(object):
             return None #return None if word not in KB
         node = node.next()
         edges = node.outE()
+        if(edges == None):
+            return None
         for edge in edges:
             dep = edge.dep
             temp = edge.inV()
