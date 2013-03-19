@@ -30,7 +30,7 @@ def removeStopWords(splitText):
     return filtered_words
 
 def makeQueryString(text):
-    words=removePunctuations(text)
+    words=removePunctuations(text.encode('ascii','ignore'))
     words=words.split()
     words=removeStopWords(words)
     queryStr=""
@@ -57,7 +57,7 @@ def extractLinks(page):
 
 def fetchSentsFromPages(urlList):
     contents=[]
-    for count in range(0,1):
+    for count in range(0,5):
         link=urlList[count]
         req=Request(link,headers={'User-Agent' : "Magic Browser"})
         res=urlopen(req)
@@ -67,6 +67,7 @@ def fetchSentsFromPages(urlList):
         except:
             body=strip_tags(res.read())
         body=body[:2000]
+        body = body.lower()
         # sentenece tokenize  also use concordance.
         # body_tokens= word_tokenize(body)
         # text =Text(body_tokens)      

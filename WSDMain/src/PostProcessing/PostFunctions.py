@@ -8,6 +8,7 @@ from PostProcessing.Neo4jDAO import Neo4jDAO
 from Parser.models import Dependency
 from Parser.depParseFunc import parseSenses, parseContents
 from nltk.compat import defaultdict
+from nltk.collocations import BigramAssocMeasures
 
 class PostFn:
     '''
@@ -30,26 +31,26 @@ class PostFn:
             for dtuple in dlist:
                 parent = dtuple[0]
                 child = dtuple[1]  
-                rel = self._chiSq(parent, child)
+                rel = self._chiSq(depGraphList,parent, child)
                 self.dep.setAll(parent, child, rel)
                 self.neoo4jDAO.insert(self.dep)
         
-    def _chiSq(self, word1, word2):
-        '''
-        calculate the chi-square value of word1 and word2.
-        :param word1 : string - first word 
-        :param word2 : string - second word
-        :return value: chi-square value of word1 and word2
-        '''
-        try:
-            syn1 = wordnet.synsets(word1)[0]
-            syn2 = wordnet.synsets(word2)[0]
-            rel = syn1.wup_similarity(syn2)
-        except:
-            rel = 0.0050 # threshold for chi-square test
-        if(rel == -1):
-            rel = 0.0050
-        return rel
+#    def _chiSq(self, word1, word2):
+#        '''
+#        calculate the chi-square value of word1 and word2.
+#        :param word1 : string - first word 
+#        :param word2 : string - second word
+#        :return value: chi-square value of word1 and word2
+#        '''
+#        try:
+#            syn1 = wordnet.synsets(word1)[0]
+#            syn2 = wordnet.synsets(word2)[0]
+#            rel = syn1.wup_similarity(syn2)
+#        except:
+#            rel = 0.0050 # threshold for chi-square test
+#        if(rel == -1):
+#            rel = 0.0050
+#        return rel
     
     def fetchSenses(self, wsdWord):
         '''
@@ -182,7 +183,80 @@ class PostFn:
         wtt.update(temp)
         return wtt
         
+    def _chiSq(self,depGraphList, word1 ,word2):
+        bigram_measures = BigramAssocMeasures()
+    
+        firstTuple = word1
+        secondTuple = word2
+        depLength = len(depGraphList)
+            # value of n11
+        i = 0
+        j = 0
+        count1 = 0
+        count2 = 0
+        count3 = 0
+        for j in range(depLength):
+            if (firstTuple == depGraphList[i][0] or firstTuple == depGraphList[i][1]) and (secondTuple == depGraphList[i][0] or secondTuple == depGraphList[i][1]):    
+                count1 = count1+1
+            else:
+                count1 = count1
+            i = i+1
+            j = j+1
+        cnt1 = count1
         
+            # value of n12
+        i = 0
+        j = 0
+    
+        for j in range(depLength):
+            if firstTuple == depGraphList[i][0] or firstTuple == depGraphList[i][1]:
+                count2 = count2+1
+            else:
+                count2 = count2
+            i = i+1
+            j = j+1
+        cnt2 = count2-1
+    
+            #value of n21
+        i = 0
+        j = 0
+    
+        for j in range(depLength):
+            if secondTuple == depGraphList[i][0] or secondTuple == depGraphList[i][1]:
+                count3 = count3+1
+            else:
+                count3 = count3
+            i = i+1
+            j = j+1
+        cnt3 = count3-1
+        
+    
+            #value of n22
+        cnt4 = depLength-cnt1-cnt2-cnt3
+    
+    
+            #total of n11 & n12
+        n1p = cnt1+cnt2
+        
+            #total of n21 & n22
+        n2p = cnt3+cnt4
+        
+    
+            #total of n11 & n21
+        np1 = cnt1+cnt3
+    
+            
+            #total of n12 & n22
+        np2 = cnt2+cnt4
+    
+        
+        
+                            # Equatio of chi square test=> X^2 = [N(n11 * n22 - n12 * n21)^2]/[n1. * n2. * n.1 * n.2]
+        
+        
+        x2 = '%0.4f' % bigram_measures.chi_sq(cnt1,(np1,n1p),depLength)
+        
+        return x2
                     
                     
                        
