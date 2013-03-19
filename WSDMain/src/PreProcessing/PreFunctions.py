@@ -11,6 +11,7 @@ from BeautifulSoup import BeautifulSoup
 from django.utils.html import strip_tags
 import re
 from libxml2 import newText
+from nltk.stem.wordnet import WordNetLemmatizer
 
 
 def removePunctuations(text,ignore="",removeNumbers=True):
@@ -68,9 +69,20 @@ def fetchSentsFromPages(urlList):
             body=strip_tags(res.read())
         body=body[:2000]
         body = body.lower()
+        body = stemWords(body,rmStopWords=True)
         # sentenece tokenize  also use concordance.
         # body_tokens= word_tokenize(body)
         # text =Text(body_tokens)      
         body=removePunctuations(body.encode('ascii','ignore'),ignore=".")  
         contents.append(body)
     return contents
+
+def stemWords(sent , rmStopWords = False):
+    sent = sent.split()
+    if(rmStopWords == True):
+        sent = removeStopWords(sent)
+    retSent =[]
+    for word in sent:
+        retSent.append(WordNetLemmatizer().lemmatize(word,'v'))
+    sent = " ".join(retSent)
+    return sent

@@ -11,6 +11,7 @@
 
     <link rel="stylesheet" href="/static/redactor/redactor.css" />
     <script src="/static/redactor/redactor.js"></script>
+    <script src="/static/lib/jquery.cookie.js"></script>
 
     <style type="text/css">
 	body .redactor_toolbar li a.redactor_btn_button1 {
@@ -42,11 +43,16 @@
 							var text = $('#123').val();
 							var selected_word = $('#123').getSelected();
 							//alert(selected_word);
+							$.cookie('status',"Sending Request")
 							$.ajax({
 								type: "POST",
 								url: "/doWSD/",
 								data: {wsdText: text, wsdWord : selected_word },
 								cache: false,
+								beforeSend: function(){
+									setInterval("showStatus();",2000); 
+									
+								},
 								success: function(html){
 									$("#loader").hide()
 									$("#response").html(html);
@@ -58,10 +64,12 @@
 				}  
 			});	
 $('.redactor_btn_button1').addClass("testbu");		
-
+		
 		}
 	);
-
+function showStatus(){
+	$(".triggerFull").html($.cookie('status'));
+}
 	</script>				
 
 </head>
@@ -78,6 +86,17 @@ $('.redactor_btn_button1').addClass("testbu");
 <div id="loader" style="display:none">
 	<div class="circle"></div>
 	<div class="circle1"></div>
+	
+
+{% if messages %}
+<ul class="messages" style="color:white">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+	
 	<div href="#" class="triggerFull">Fetching web pages</div>
 </div>
 <div id="response"></div>

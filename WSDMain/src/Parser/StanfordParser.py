@@ -39,7 +39,7 @@ class StanfordParser(ParserI):
         :return: ``Typed dependency relation`` of the sentences in the input text
         """
         in_file = self.makeFile(text)
-        cmd = ('java -mx150m -cp "'+self.working_dir+'/*:"'
+        cmd = ('java -mx512m -cp "'+self.working_dir+'/*:"'
                     ' edu.stanford.nlp.parser.lexparser.LexicalizedParser'
                     ' -outputFormat '+self.output_format+
                     ' edu/stanford/nlp/models/lexparser/'+self.model+'.ser.gz '

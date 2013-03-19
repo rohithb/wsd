@@ -11,6 +11,7 @@ import re
 from urllib import urlencode
 from nltk.tokenize import sent_tokenize
 from Parser.StanfordParser import StanfordParser
+from PreProcessing.PreFunctions import stemWords
 
 def parseContents(contentList):
     typedDep=""
@@ -35,6 +36,7 @@ def parseSenses(senseList):
     str1=[]
     str1.append('. '.join(senseList)) # to make the whole list into a single item
                                         # otherwise the parser need to be initialised many times.
+    str1[0] = stemWords(str1[0], rmStopWords= True)
     parser = StanfordParser ("/home/rohith/stanford-parser")
     for content in str1:
         typedDep += parser.parse(content)

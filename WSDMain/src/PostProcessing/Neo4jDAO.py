@@ -22,11 +22,13 @@ class Neo4jDAO(object):
         '''
         Method for inserting a parent ,child and their relatedness to database
         '''
+        flag = 0 # to prevent creating duplicate edges
         #check whether parent node already exists if not create the node
         parent = self.g.vertices.index.lookup(node=dependency.getParent())
         if(parent == None):
             parent = self.g.vertices.create(node=dependency.getParent())
         else:
+            flag += 1
             parent = parent.next()
             
         #check whether child node already exists if not create the node
@@ -34,10 +36,12 @@ class Neo4jDAO(object):
         if(child == None):
             child = self.g.vertices.create(node=dependency.getChild())
         else:
+            flag +=1
             child = child.next()
             
-        #create edge between parent and child with label "rel" and property "dep"    
-        self.g.edges.create(parent, "rel", child, dep=dependency.getRel())
+        #create edge between parent and child with label "rel" and property "dep"
+        if(flag<2):    
+            self.g.edges.create(parent, "rel", child, dep=dependency.getRel())
         
     def findDependent(self, word):
         '''
