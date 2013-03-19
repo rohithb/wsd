@@ -17,6 +17,7 @@ class PostFn:
         self.neoo4jDAO = Neo4jDAO()
         self.dep = Dependency()
         self.wt={}
+        self.temp = 0
         
     def insertToDB(self,depGraphList):
         '''
@@ -46,6 +47,8 @@ class PostFn:
             rel = syn1.wup_similarity(syn2)
         except:
             rel = 0.0050 # threshold for chi-square test
+        if(rel == -1):
+            rel = 0.0050
         return rel
     
     def fetchSenses(self, wsdWord):
@@ -99,8 +102,21 @@ class PostFn:
                 self.calulateWeightSense(i,level,l)
         return self.wt
     
+    def calulateWeightSense1(self,parent, level,l):
+        if(level == self.temp and parent == 'ROOT'):
+            return
+        if(level == self.temp-1):
+            self.wt={}
+        level+=1 
+        a=l[parent]
+        if(len(a) != 0):
+            for i in a:
+                self.wt[i]=1.0/level
+                self.calulateWeightSense(i,level,l)
+        return self.wt
+    
 
-    def depScore(self, senseList, wsdText, senseTrees, wsdTextTree):
+    def depScore(self, senseList, wsdText, wsdWord, senseTrees, wsdTextTree):
         '''
         calculate DepScore and return the index number of the sense with largest DepScore
         Process: Search the KB for each word in each sense
@@ -109,7 +125,7 @@ class PostFn:
         score = []
         l = len(senseList)
         wsdText = wsdText.split()
-        wtWSDText = self.calulateWeightSense('ROOT', 0, wsdTextTree)
+        wtWSDText = self.calculateWeightWSDText(wsdWord, wsdTextTree)
         for i in range(0,l):
             tempScore = 0.0
             wtSense = self.calulateWeightSense('ROOT', 0, senseTrees[i])
@@ -127,8 +143,46 @@ class PostFn:
                     continue
             score.append(tempScore)
         return score.index(max(score))
-                    
-                    
+    
+    def glossScore(self, senseList, wsdText, wsdWord ,senseTrees, wsdTextTree ):
+        score =[]
+        l = len(senseList)
+        wsdText = wsdText.split()
+        wtWSDText = self.calculateWeightWSDText(wsdWord, wsdTextTree)
+        for i in range(0,l):
+            tempScore = 0.0
+            wtSense = self.calulateWeightSense('ROOT', 0, senseTrees[i])
+            sense = senseList[i].split()   
+            for word in sense:
+                if(word in wsdText):
+                    tempScore += wtSense[word] + wtWSDText[word]
+            score.append(tempScore)
+        return score.index(max(score))
+    
+    def getLevel(self,word,tree,parent, level):
+        if(level == 1 and parent == 'ROOT'):
+            return 
+        level+=1
+        a=tree[parent]
+        if(len(a) != 0):
+            for i in a:
+                if(i == word):
+                    self.temp = level
+                self.getLevel(word,tree,i,level)
+        return self.temp
+    
+    def calculateWeightWSDText(self, word, tree):
+        self.wt = {}
+        temp ={}
+        wtTemp = self.calulateWeightSense(word, 0, tree)
+        temp.update(wtTemp)
+        level = self.getLevel(word, tree, 'ROOT', 0)
+        level -= 1
+        wtt = self.calulateWeightSense1("ROOT", level, tree)
+        wtt.update(temp)
+        return wtt
+        
+        
                     
                     
                        

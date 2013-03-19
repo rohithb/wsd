@@ -5,7 +5,8 @@
 
  
  
-    <link rel="stylesheet" href="./css/live.css" />
+    <link rel="stylesheet" href="static/css/live.css" />
+    <link rel="stylesheet" href="static/css/loader.css" />
     <script src="/static/lib/jquery-1.7.min.js"></script>
 
     <link rel="stylesheet" href="/static/redactor/redactor.css" />
@@ -37,6 +38,7 @@
 						title: 'Disambiguate', 
 						callback: function(obj)
 						{
+							$("#loader").show()
 							var text = $('#123').val();
 							var selected_word = $('#123').getSelected();
 							//alert(selected_word);
@@ -46,6 +48,7 @@
 								data: {wsdText: text, wsdWord : selected_word },
 								cache: false,
 								success: function(html){
+									$("#loader").hide()
 									$("#response").html(html);
 								}
 								});
@@ -72,5 +75,10 @@ $('.redactor_btn_button1').addClass("testbu");
 		</textarea>
 
 </br></br>
+<div id="loader" style="display:none">
+	<div class="circle"></div>
+	<div class="circle1"></div>
+	<div href="#" class="triggerFull">Fetching web pages</div>
+</div>
 <div id="response"></div>
 </body></html>
