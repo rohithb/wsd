@@ -12,6 +12,7 @@ from django.utils.html import strip_tags
 import re
 from libxml2 import newText
 from nltk.stem.wordnet import WordNetLemmatizer
+import os
 
 
 def removePunctuations(text,ignore="",removeNumbers=True):
@@ -86,3 +87,10 @@ def stemWords(sent , rmStopWords = False):
         retSent.append(WordNetLemmatizer().lemmatize(word,'v'))
     sent = " ".join(retSent)
     return sent
+
+def setStatus(status):
+    f = open("/home/rohith/stat.txt", "w")
+    f.truncate()
+    f.write(status)
+    f.close()
+    return

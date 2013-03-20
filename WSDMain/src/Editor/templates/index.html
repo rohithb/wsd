@@ -11,7 +11,7 @@
 
     <link rel="stylesheet" href="/static/redactor/redactor.css" />
     <script src="/static/redactor/redactor.js"></script>
-    <script src="/static/lib/jquery.cookie.js"></script>
+ 
 
     <style type="text/css">
 	body .redactor_toolbar li a.redactor_btn_button1 {
@@ -42,12 +42,17 @@
 							$("#loader").show()
 							var text = $('#123').val();
 							var selected_word = $('#123').getSelected();
+							var updateKB = "off"
+							if ($('#kb_update').is(':checked')) {
+								updateKB = "on"
+							} else {
+								updateKB = "off"
+							} 
 							//alert(selected_word);
-							$.cookie('status',"Sending Request")
 							$.ajax({
 								type: "POST",
 								url: "/doWSD/",
-								data: {wsdText: text, wsdWord : selected_word },
+								data: {wsdText: text, wsdWord : selected_word, updateKB : updateKB },
 								cache: false,
 								beforeSend: function(){
 									setInterval("showStatus();",2000); 
@@ -68,7 +73,14 @@ $('.redactor_btn_button1').addClass("testbu");
 		}
 	);
 function showStatus(){
-	$(".triggerFull").html($.cookie('status'));
+	$.ajax({
+		type: "POST",
+		url: "/status/",
+		cache: false,
+		success: function(html){
+			$(".triggerFull").html(html);
+		}
+		});
 }
 	</script>				
 
@@ -81,23 +93,14 @@ function showStatus(){
 		<textarea id="123" name="content">
 			 went fishing for some sea bass.
 		</textarea>
-
+</br>
+<div style="color: #fff; border: 1px #fff solid">
+<input id="kb_update" value="ok" type="checkbox"/> Update Knowledge Base</div
 </br></br>
 <div id="loader" style="display:none">
 	<div class="circle"></div>
 	<div class="circle1"></div>
-	
-
-{% if messages %}
-<ul class="messages" style="color:white">
-    {% for message in messages %}
-    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
-
-	
-	<div href="#" class="triggerFull">Fetching web pages</div>
+	<div href="#" class="triggerFull">Sending The Request</div>
 </div>
 <div id="response"></div>
 </body></html>

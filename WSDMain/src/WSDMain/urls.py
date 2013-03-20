@@ -8,7 +8,7 @@ from Parser.views import makeGraph, doWSD
 
 urlpatterns = patterns('',
                       (r'^$',editor),
-                      (r'^makeGraph/$',makeGraph),
+                      (r'^status/$',makeGraph),
                       (r'^doWSD/$',doWSD),
     # Examples:
     # url(r'^$', 'WSDMain.views.home', name='home'),
