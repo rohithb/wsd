@@ -8,6 +8,7 @@ from PreProcessing.PreFunctions import makeQueryString, googleSearch,\
     extractLinks, fetchSentsFromPages, stemWords, setStatus
 from PostProcessing.PostFunctions import PostFn
 from django.contrib import messages
+from django.utils.html import strip_tags
 
 def makeGraph(request):
     stat_file = open("/home/rohith/stat.txt")
@@ -28,13 +29,14 @@ def doWSD(request):
         updateKB = request.POST['updateKB']
     wsdText = wsdText.lower()
     wsdWord = wsdWord.lower()
+    wsdText = strip_tags(wsdText)
     
     wsdText = stemWords(wsdText)
     wsdWord = stemWords(wsdWord)
     if(updateKB == "on"):
         setStatus("Making Query String")
         queryStr = makeQueryString(wsdText)
-        setStatus("Searching on Bing.com")
+        setStatus("Searching on Yahoo.com")
         page = googleSearch(queryStr)
         setStatus("Extracting Links From Result")
         urlList = extractLinks(page)
@@ -42,6 +44,7 @@ def doWSD(request):
         contents=fetchSentsFromPages(urlList)
         setStatus("Parsing Contents")
         depGraphList=parseContents(contents)
+        setStatus("Updating knowledgebase")
         postFn.insertToDB(depGraphList)
     setStatus("Fetching Senses")
     senseList = postFn.fetchSenses(wsdWord)
@@ -57,9 +60,9 @@ def doWSD(request):
         sense = candidateSense1
     else:
         if(candidateSense1 > candidateSense2):
-            sense = candidateSense1
-        else:
             sense = candidateSense2
-    html = '<h4 style="color:white">'+ wsdWord + ' : ' + senseList[sense] + ' </h4>'
+        else:
+            sense = candidateSense1
+    html = postFn.createMarkup(senseList[sense],wsdText,wsdWord)
     return HttpResponse(html)
     

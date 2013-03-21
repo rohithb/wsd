@@ -41,19 +41,20 @@ def makeQueryString(text):
     queryStr=queryStr[:-1]
     return queryStr
 def googleSearch(query):
-    url = 'http://www.bing.com/search?q='+query
+    url = 'http://in.search.yahoo.com/search?p='+query
 #   values = {
 #             'q' : query 
 #             }
 #   data = urlencode(values)
 #    req = Request(url,data)
-    response = urlopen(url)
+    req=Request(url,headers={'User-Agent' : "Magic Browser"})
+    response=urlopen(req)
     the_page=response.read()
     return the_page
 def extractLinks(page):
     soup=BeautifulSoup(''.join(page))
     urlList=[]
-    for a in soup.findAll('div',{"class":"sb_tlst"}):
+    for a in soup.findAll('div',{"class":"res"}):
             urlList.append(a.findNext('a').get('href').encode('ascii','ignore')) 
     return urlList
 
@@ -62,7 +63,10 @@ def fetchSentsFromPages(urlList):
     for count in range(0,5):
         link=urlList[count]
         req=Request(link,headers={'User-Agent' : "Magic Browser"})
-        res=urlopen(req)
+        try:
+            res=urlopen(req)
+        except:
+            continue
         soup=BeautifulSoup(''.join(res.read()))
         try:
             body=strip_tags(soup.html.body)

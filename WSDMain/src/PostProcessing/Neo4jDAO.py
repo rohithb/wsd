@@ -40,8 +40,8 @@ class Neo4jDAO(object):
             child = child.next()
             
         #create edge between parent and child with label "rel" and property "dep"
-        if(flag<2):    
-            self.g.edges.create(parent, "rel", child, dep=dependency.getRel())
+        #if(flag<2):    
+        self.g.edges.create(parent, "rel", child, dep=dependency.getRel())
         
     def findDependent(self, word):
         '''

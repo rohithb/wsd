@@ -39,9 +39,13 @@
 						title: 'Disambiguate', 
 						callback: function(obj)
 						{
-							$("#loader").show()
+							
 							var text = $('#123').val();
 							var selected_word = $('#123').getSelected();
+							if(selected_word == ""){
+								alert ( " Please select the word to be disambiguated");
+								return false;
+							}
 							var updateKB = "off"
 							if ($('#kb_update').is(':checked')) {
 								updateKB = "on"
@@ -49,6 +53,7 @@
 								updateKB = "off"
 							} 
 							//alert(selected_word);
+							$("#loader").show()
 							$.ajax({
 								type: "POST",
 								url: "/doWSD/",
@@ -91,7 +96,7 @@ function showStatus(){
 	<div id="page">
 
 		<textarea id="123" name="content">
-			 went fishing for some sea bass.
+			 A large company needs sustainable business model.
 		</textarea>
 </br>
 <div style="color: #fff; border: 1px #fff solid">

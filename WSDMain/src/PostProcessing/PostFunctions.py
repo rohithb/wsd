@@ -11,6 +11,7 @@ from nltk.compat import defaultdict
 from nltk.collocations import BigramAssocMeasures
 from nltk.stem.wordnet import WordNetLemmatizer
 from PreProcessing.PreFunctions import stemWords, removeStopWords
+from Editor.models import trim
 
 class PostFn:
     '''
@@ -129,41 +130,53 @@ class PostFn:
         score = []
         l = len(senseList)
         wsdText = wsdText.split()
-        wtWSDText = self.calculateWeightWSDText(wsdWord, wsdTextTree)
-        for i in range(0,l):
-            tempScore = 0.0
-            wtSense = self.calulateWeightSense('ROOT', 0, senseTrees[i])
-            sense = senseList[i].split()
-            for word in sense:
-                deps = self.neoo4jDAO.findDependent(word)
-                if(deps != None):
-                    for tup in deps:
-                        if(str(tup[0]) in wsdText):
-                            node = str(tup[0])
-                            wts=float(wtSense[word])
-                            wtt =float(wtWSDText[node])
-                            tempScore += float(tup[1])* wts* wtt
-                else:
-                    continue
-            score.append(tempScore)
-        return score.index(max(score))
+        try:
+            wtWSDText = self.calculateWeightWSDText(wsdWord, wsdTextTree)
+            for i in range(0,l):
+                tempScore = 0.0
+                wtSense = self.calulateWeightSense('ROOT', 0, senseTrees[i])
+                sense = senseList[i].split()
+                for word in sense:
+                    deps = self.neoo4jDAO.findDependent(word)
+                    if(deps != None):
+                        for tup in deps:
+                            if(str(tup[0]) in wsdText):
+                                node = str(tup[0])
+                                try:
+                                    wts=float(wtSense[word])
+                                    wtt =float(wtWSDText[node])
+                                    tempScore += float(tup[1])* wts* wtt
+                                except:
+                                    tempScore +=0
+                    else:
+                        continue
+                score.append(tempScore)
+            return score.index(max(score))
+        except:
+            return 0
     
     def glossScore(self, senseList, wsdText, wsdWord ,senseTrees, wsdTextTree ):
         score =[]
         l = len(senseList)
         wsdText = wsdText.split()
-        wtWSDText = self.calculateWeightWSDText(wsdWord, wsdTextTree)
-        for i in range(0,l):
-            tempScore = 0.0
-            wtSense = self.calulateWeightSense('ROOT', 0, senseTrees[i])
-            sense = senseList[i].lower().split()  
-            sense = removeStopWords(sense) 
-            for word in sense:
-                word = WordNetLemmatizer().lemmatize(word,'v')  # stemming the word
-                if(word in wsdText):
-                    tempScore += float(wtSense[word]) + float(wtWSDText[word])
-            score.append(tempScore)
-        return score.index(max(score))
+        try:
+            wtWSDText = self.calculateWeightWSDText(wsdWord, wsdTextTree)
+            for i in range(0,l):
+                tempScore = 0.0
+                wtSense = self.calulateWeightSense('ROOT', 0, senseTrees[i])
+                sense = senseList[i].lower().split()  
+                sense = removeStopWords(sense) 
+                for word in sense:
+                    word = WordNetLemmatizer().lemmatize(word,'v')  # stemming the word
+                    if(word in wsdText):
+                        try:
+                            tempScore += float(wtSense[word]) + float(wtWSDText[word])
+                        except:
+                            tempScore += 0
+                score.append(tempScore)
+            return score.index(max(score))
+        except:
+            return 0
     
     def getLevel(self,word,tree,parent, level):
         if(level == 1 and parent == 'ROOT'):
@@ -186,7 +199,10 @@ class PostFn:
         if (level != 0):
             level -= 1
         wtt = self.calulateWeightSense1("ROOT", level, tree)
-        wtt.update(temp)
+        try:
+            wtt.update(temp)
+        except:
+            pass
         return wtt
         
     def _chiSq(self,depGraphList, word1 ,word2):
@@ -247,6 +263,16 @@ class PostFn:
         if( x2 < 0):
             x2 = -x2
         return x2
+
+    
+    def createMarkup(self, sense , wsdText, wsdWord):
+        temp = trim(wsdText)
+        if(temp!=0):
+            sense =temp
+        html = '<h4 style="color:white">'+ wsdWord + ' : ' + sense + ' </h4>'
+        return html
+    
+    
                     
                     
                        
