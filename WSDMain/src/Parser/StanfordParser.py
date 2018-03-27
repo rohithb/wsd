@@ -1,10 +1,3 @@
-# Natural Language Toolkit: Interface to StanfordParser
-#
-# Author: Rohith Bhaskaran <vrarohith@gmail.com>
-#
-# Copyright (C) 2001-2013 NLTK Project
-# URL: <http://www.nltk.org/>
-# For license information, see LICENSE.TXT
 
 import os
 import tempfile
